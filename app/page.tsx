@@ -52,8 +52,8 @@ export default function Home() {
       const encodedQuery = encodeURIComponent(query);
       
       // Replace with your actual API key and CX
-      const apiKey = "AIzaSyDHZ5_9TFjLIbuAAKoQXCmq9_aRia9lmsc"; // This should be your actual key
-      const cx = "52ea300a2b37a439e"; // This should be your actual cx
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+      const cx = process.env.NEXT_PUBLIC_GOOGLE_CX;
       
       const response = await fetch(
         `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodedQuery}`
