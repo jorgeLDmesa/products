@@ -256,8 +256,8 @@ export default function CsvPage() {
     const encodedQuery = encodeURIComponent(query);
     
     // API key and CX from main page
-    const apiKey = "AIzaSyDHZ5_9TFjLIbuAAKoQXCmq9_aRia9lmsc"; 
-    const cx = "52ea300a2b37a439e";
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+    const cx = process.env.NEXT_PUBLIC_GOOGLE_CX;
     
     const response = await fetch(
       `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodedQuery}`
