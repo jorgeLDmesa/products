@@ -97,6 +97,8 @@ export default function CsvPage() {
             idColumnName = "Item Description";
           } else if (store === "LOWES") {
             idColumnName = "Model";
+          } else if (store === "WALMART") {
+            idColumnName = "Model";
           }
           // Future stores can be added here with their respective column names
 
@@ -145,6 +147,8 @@ export default function CsvPage() {
                 query = `Home Depot ${id}`;
               } else if (store === "LOWES") {
                 query = `Lowes ${id}`;
+              } else if (store === "WALMART") {
+                query = `Walmart ${id}`;
               }
 
               // Search for image (now with enhanced URL)
@@ -327,6 +331,21 @@ export default function CsvPage() {
         }
         return firstImage;
       }
+    } else if (store === "WALMART") {
+      // Look for the first cse_image with source that starts with "https://i5.walmartimages.com/"
+      const walmartImage = data.items?.find(item => 
+        item.pagemap?.cse_image?.[0]?.src.startsWith("https://i5.walmartimages.com/")
+      )?.pagemap?.cse_image?.[0]?.src;
+      
+      if (walmartImage) {
+        return walmartImage;
+      }
+      
+      // If not found with the specific URL pattern, use the first image
+      const firstImage = data.items?.[0]?.pagemap?.cse_image?.[0]?.src;
+      if (firstImage) {
+        return firstImage;
+      }
     }
     
     return null;
@@ -360,6 +379,7 @@ export default function CsvPage() {
                 <SelectItem value="BESTBUY">BEST BUY</SelectItem>
                 <SelectItem value="HOMEDEPOT">HOME DEPOT</SelectItem>
                 <SelectItem value="LOWES">LOWES</SelectItem>
+                <SelectItem value="WALMART">WALMART</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -379,6 +399,7 @@ export default function CsvPage() {
               {store === "BESTBUY" && "Your CSV should include a column named 'Model' with Best Buy model numbers."}
               {store === "HOMEDEPOT" && "Your CSV should include a column named 'Item Description' with Home Depot product descriptions."}
               {store === "LOWES" && "Your CSV should include a column named 'Model' with Lowes model numbers."}
+              {store === "WALMART" && "Your CSV should include a column named 'Model' with Walmart model numbers."}
             </p>
           </div>
           
