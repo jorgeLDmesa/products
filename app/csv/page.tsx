@@ -47,6 +47,7 @@ export default function CsvPage() {
     status: "idle",
     message: ""
   });
+  const [duplicateItems, setDuplicateItems] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -68,12 +69,14 @@ export default function CsvPage() {
       fileInputRef.current.value = "";
     }
     setFile(null);
+    setDuplicateItems([]);
   };
 
   const processCSV = async () => {
     if (!file) return;
 
     setIsProcessing(true);
+    setDuplicateItems([]);
     setProcessingStatus({
       current: 0,
       total: 0,
@@ -123,11 +126,28 @@ export default function CsvPage() {
 
           // Create zip file
           const zip = new JSZip();
+          const processedIds = new Set<string>();
+          const duplicates: string[] = [];
 
           // Process each row
           for (let i = 0; i < validRows.length; i++) {
             const row = validRows[i];
             const id = row[idColumnName].toString().trim();
+            
+            // Check if this ID has already been processed
+            if (processedIds.has(id)) {
+              console.log(`Skipping duplicate item: ${id}`);
+              duplicates.push(id);
+              setProcessingStatus(prev => ({
+                ...prev,
+                current: i + 1,
+                message: `Skipping duplicate: ${id} (${i + 1}/${validRows.length})`
+              }));
+              continue;
+            }
+            
+            // Add ID to processed set
+            processedIds.add(id);
             
             setProcessingStatus(prev => ({
               ...prev,
@@ -230,6 +250,8 @@ export default function CsvPage() {
             downloadUrl: zipUrl
           });
           
+          // Set the duplicate items list for display
+          setDuplicateItems(duplicates);
         } catch (error) {
           setProcessingStatus({
             current: 0,
@@ -459,6 +481,23 @@ export default function CsvPage() {
                   Download ZIP File
                 </Button>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Duplicate Items List */}
+        {duplicateItems.length > 0 && (
+          <div className="p-4 border rounded-lg bg-yellow-50 border-yellow-200">
+            <div className="flex flex-col gap-2">
+              <p className="font-medium">Duplicate Items Found ({duplicateItems.length})</p>
+              <p className="text-sm">These items were found multiple times in your CSV and were only processed once:</p>
+              <div className="max-h-40 overflow-y-auto">
+                <ul className="text-sm list-disc pl-5">
+                  {duplicateItems.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         )}
